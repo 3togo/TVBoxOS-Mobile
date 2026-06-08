@@ -1,123 +1,236 @@
 package com.github.tvbox.osc.ui.fragment;
 
 import android.annotation.SuppressLint;
+import com.github.tvbox.osc.util.M3u8;
 import android.annotation.TargetApi;
+import com.github.tvbox.osc.util.M3u8;
 import android.app.Activity;
+import com.github.tvbox.osc.util.M3u8;
 import android.content.Context;
+import com.github.tvbox.osc.util.M3u8;
 import android.content.pm.ActivityInfo;
+import com.github.tvbox.osc.util.M3u8;
 import android.graphics.Bitmap;
+import com.github.tvbox.osc.util.M3u8;
 import android.graphics.Color;
+import com.github.tvbox.osc.util.M3u8;
 import android.net.http.SslError;
+import com.github.tvbox.osc.util.M3u8;
 import android.os.Build;
+import com.github.tvbox.osc.util.M3u8;
 import android.os.Bundle;
+import com.github.tvbox.osc.util.M3u8;
 import android.os.Handler;
+import com.github.tvbox.osc.util.M3u8;
 import android.os.Message;
+import com.github.tvbox.osc.util.M3u8;
 import android.text.TextUtils;
+import com.github.tvbox.osc.util.M3u8;
 import android.view.KeyEvent;
+import com.github.tvbox.osc.util.M3u8;
 import android.view.View;
+import com.github.tvbox.osc.util.M3u8;
 import android.view.ViewGroup;
+import com.github.tvbox.osc.util.M3u8;
 import android.webkit.ConsoleMessage;
+import com.github.tvbox.osc.util.M3u8;
 import android.webkit.CookieManager;
+import com.github.tvbox.osc.util.M3u8;
 import android.webkit.JsPromptResult;
+import com.github.tvbox.osc.util.M3u8;
 import android.webkit.JsResult;
+import com.github.tvbox.osc.util.M3u8;
 import android.webkit.SslErrorHandler;
+import com.github.tvbox.osc.util.M3u8;
 import android.webkit.WebChromeClient;
+import com.github.tvbox.osc.util.M3u8;
 import android.webkit.WebResourceRequest;
+import com.github.tvbox.osc.util.M3u8;
 import android.webkit.WebResourceResponse;
+import com.github.tvbox.osc.util.M3u8;
 import android.webkit.WebSettings;
+import com.github.tvbox.osc.util.M3u8;
 import android.webkit.WebView;
+import com.github.tvbox.osc.util.M3u8;
 import android.webkit.WebViewClient;
+import com.github.tvbox.osc.util.M3u8;
 import android.widget.ImageView;
+import com.github.tvbox.osc.util.M3u8;
 import android.widget.TextView;
+import com.github.tvbox.osc.util.M3u8;
 import android.widget.Toast;
+import com.github.tvbox.osc.util.M3u8;
 
 import androidx.annotation.NonNull;
+import com.github.tvbox.osc.util.M3u8;
 import androidx.annotation.Nullable;
+import com.github.tvbox.osc.util.M3u8;
 import androidx.lifecycle.Observer;
+import com.github.tvbox.osc.util.M3u8;
 import androidx.lifecycle.ViewModelProvider;
+import com.github.tvbox.osc.util.M3u8;
 import androidx.recyclerview.widget.DiffUtil;
+import com.github.tvbox.osc.util.M3u8;
 
 import com.blankj.utilcode.util.ColorUtils;
+import com.github.tvbox.osc.util.M3u8;
 import com.blankj.utilcode.util.LogUtils;
+import com.github.tvbox.osc.util.M3u8;
 import com.blankj.utilcode.util.RegexUtils;
+import com.github.tvbox.osc.util.M3u8;
 import com.blankj.utilcode.util.ScreenUtils;
+import com.github.tvbox.osc.util.M3u8;
 import com.blankj.utilcode.util.SpanUtils;
+import com.github.tvbox.osc.util.M3u8;
 import com.blankj.utilcode.util.ToastUtils;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.catvod.crawler.Spider;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.R;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.api.ApiConfig;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.base.App;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.base.BaseLazyFragment;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.bean.ParseBean;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.bean.SourceBean;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.bean.Subtitle;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.bean.VodInfo;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.cache.CacheManager;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.event.RefreshEvent;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.player.EXOmPlayer;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.player.IjkMediaPlayer;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.player.MyVideoView;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.player.TrackInfo;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.player.TrackInfoBean;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.player.controller.VodController;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.server.RemoteServer;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.ui.activity.DetailActivity;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.ui.adapter.ParseAdapter;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.ui.adapter.SelectDialogAdapter;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.ui.dialog.PlayingControlDialog;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.ui.dialog.PlayingControlRightDialog;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.ui.dialog.SearchSubtitleDialog;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.ui.dialog.SelectDialog;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.ui.dialog.SubtitleDialog;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.AdBlocker;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.DefaultConfig;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.HawkConfig;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.LOG;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.MD5;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.PlayerHelper;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.VideoParseRuler;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.thunder.Jianpian;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.thunder.Thunder;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.viewmodel.SourceViewModel;
+import com.github.tvbox.osc.util.M3u8;
 import com.google.android.exoplayer2.Player;
+import com.github.tvbox.osc.util.M3u8;
 import com.google.android.exoplayer2.text.Cue;
+import com.github.tvbox.osc.util.M3u8;
 import com.gyf.immersionbar.BarHide;
+import com.github.tvbox.osc.util.M3u8;
 import com.gyf.immersionbar.ImmersionBar;
+import com.github.tvbox.osc.util.M3u8;
 import com.lxj.xpopup.XPopup;
+import com.github.tvbox.osc.util.M3u8;
 import com.lxj.xpopup.core.BasePopupView;
+import com.github.tvbox.osc.util.M3u8;
 import com.lxj.xpopup.enums.PopupPosition;
+import com.github.tvbox.osc.util.M3u8;
 import com.lzy.okgo.OkGo;
+import com.github.tvbox.osc.util.M3u8;
 import com.lzy.okgo.callback.AbsCallback;
+import com.github.tvbox.osc.util.M3u8;
 import com.lzy.okgo.model.HttpHeaders;
+import com.github.tvbox.osc.util.M3u8;
 import com.lzy.okgo.model.Response;
+import com.github.tvbox.osc.util.M3u8;
 import com.obsez.android.lib.filechooser.ChooserDialog;
+import com.github.tvbox.osc.util.M3u8;
 import com.orhanobut.hawk.Hawk;
+import com.github.tvbox.osc.util.M3u8;
 
 import org.apache.commons.lang3.StringUtils;
+import com.github.tvbox.osc.util.M3u8;
 import org.greenrobot.eventbus.EventBus;
+import com.github.tvbox.osc.util.M3u8;
 import org.greenrobot.eventbus.Subscribe;
+import com.github.tvbox.osc.util.M3u8;
 import org.greenrobot.eventbus.ThreadMode;
+import com.github.tvbox.osc.util.M3u8;
 import org.jetbrains.annotations.NotNull;
+import com.github.tvbox.osc.util.M3u8;
 import org.json.JSONException;
+import com.github.tvbox.osc.util.M3u8;
 import org.json.JSONObject;
+import com.github.tvbox.osc.util.M3u8;
 
 import java.io.File;
+import com.github.tvbox.osc.util.M3u8;
 import java.net.URLEncoder;
+import com.github.tvbox.osc.util.M3u8;
 import java.util.HashMap;
+import com.github.tvbox.osc.util.M3u8;
 import java.util.Iterator;
+import com.github.tvbox.osc.util.M3u8;
 import java.util.LinkedHashMap;
+import com.github.tvbox.osc.util.M3u8;
 import java.util.LinkedList;
+import com.github.tvbox.osc.util.M3u8;
 import java.util.List;
+import com.github.tvbox.osc.util.M3u8;
 import java.util.Map;
+import com.github.tvbox.osc.util.M3u8;
 import java.util.concurrent.ExecutorService;
+import com.github.tvbox.osc.util.M3u8;
 import java.util.concurrent.Executors;
+import com.github.tvbox.osc.util.M3u8;
 import java.util.concurrent.atomic.AtomicInteger;
+import com.github.tvbox.osc.util.M3u8;
 
 import me.jessyan.autosize.AutoSize;
+import com.github.tvbox.osc.util.M3u8;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
+import com.github.tvbox.osc.util.M3u8;
 import tv.danmaku.ijk.media.player.IjkTimedText;
+import com.github.tvbox.osc.util.M3u8;
 import xyz.doikki.videoplayer.player.AbstractPlayer;
+import com.github.tvbox.osc.util.M3u8;
 import xyz.doikki.videoplayer.player.ProgressManager;
+import com.github.tvbox.osc.util.M3u8;
 
 public class PlayFragment extends BaseLazyFragment {
     private MyVideoView mVideoView;
@@ -679,77 +792,6 @@ public class PlayFragment extends BaseLazyFragment {
         }
     }
 
-    private String removeMinorityUrl(String tsUrlPre, String m3u8content) {
-        if (!m3u8content.startsWith("#EXTM3U")) return null;
-        String linesplit = "\n";
-        if (m3u8content.contains("\r\n"))
-            linesplit = "\r\n";
-        String[] lines = m3u8content.split(linesplit);
-
-        HashMap<String, Integer> preUrlMap = new HashMap<>();
-        for (String line : lines) {
-            if (line.length() == 0 || line.charAt(0) == '#') {
-                continue;
-            }
-            int ilast = line.lastIndexOf('.');
-            if (ilast <= 4) {
-                continue;
-            }
-            String preUrl = line.substring(0, ilast - 4);
-            Integer cnt = preUrlMap.get(preUrl);
-            if (cnt != null) {
-                preUrlMap.put(preUrl, cnt + 1);
-            } else {
-                preUrlMap.put(preUrl, 1);
-            }
-        }
-        if (preUrlMap.size() <= 1) return null;
-        if (preUrlMap.size() > 5) return null;//too many different url, can not identify ads url
-        int maxTimes = 0;
-        String maxTimesPreUrl = "";
-        for (Map.Entry<String, Integer> entry : preUrlMap.entrySet()) {
-            if (entry.getValue() > maxTimes) {
-                maxTimesPreUrl = entry.getKey();
-                maxTimes = entry.getValue();
-            }
-        }
-        if (maxTimes == 0) return null;
-
-        boolean dealedExtXKey = false;
-        for (int i = 0; i < lines.length; ++i) {
-            if (!dealedExtXKey && lines[i].startsWith("#EXT-X-KEY")) {
-                String keyUrl = StringUtils.substringBetween(lines[i], "URI=\"", "\"");
-                if (keyUrl != null && !keyUrl.startsWith("http://") && !keyUrl.startsWith("https://")) {
-                    String newKeyUrl;
-                    if (keyUrl.charAt(0) == '/') {
-                        int ifirst = tsUrlPre.indexOf('/', 9);//skip https://, http://
-                        newKeyUrl = tsUrlPre.substring(0, ifirst) + keyUrl;
-                    } else
-                        newKeyUrl = tsUrlPre + keyUrl;
-                    lines[i] = lines[i].replace("URI=\"" + keyUrl + "\"", "URI=\"" + newKeyUrl + "\"");
-                }
-                dealedExtXKey = true;
-            }
-            if (lines[i].length() == 0 || lines[i].charAt(0) == '#') {
-                continue;
-            }
-            if (lines[i].startsWith(maxTimesPreUrl)) {
-                if (!lines[i].startsWith("http://") && !lines[i].startsWith("https://")) {
-                    if (lines[i].charAt(0) == '/') {
-                        int ifirst = tsUrlPre.indexOf('/', 9);//skip https://, http://
-                        lines[i] = tsUrlPre.substring(0, ifirst) + lines[i];
-                    } else
-                        lines[i] = tsUrlPre + lines[i];
-                }
-            } else {
-                if (i > 0 && lines[i - 1].length() > 0 && lines[i - 1].charAt(0) == '#') {
-                    lines[i - 1] = "";
-                }
-                lines[i] = "";
-            }
-        }
-        return StringUtils.join(lines, linesplit);
-    }
 
     void playUrl(String url, HashMap<String, String> headers) {
         mCurrentUrl = url;
@@ -757,7 +799,11 @@ public class PlayFragment extends BaseLazyFragment {
             startPlayUrl(url, headers);
             return;
         }
-        if (!url.contains("://127.0.0.1/") && !url.contains(".m3u8")) {
+        if (url.startsWith("http://127.0.0.1") || !url.contains(".m3u8")) {
+            startPlayUrl(url, headers);
+            return;
+        }
+        if(DefaultConfig.noAd(mVodInfo.playFlag)){
             startPlayUrl(url, headers);
             return;
         }
@@ -814,7 +860,7 @@ public class PlayFragment extends BaseLazyFragment {
                         if ("".equals(forwardurl)) {
                             int ilast = url.lastIndexOf('/');
 
-                            RemoteServer.m3u8Content = removeMinorityUrl(url.substring(0, ilast + 1), content);
+                            RemoteServer.m3u8Content = M3u8.purify(url.substring(0, ilast + 1), content);
                             if (RemoteServer.m3u8Content == null)
                                 startPlayUrl(url, headers);
                             else {
@@ -832,7 +878,7 @@ public class PlayFragment extends BaseLazyFragment {
                                     public void onSuccess(com.lzy.okgo.model.Response<String> response) {
                                         String content = response.body();
                                         int ilast = finalforwardurl.lastIndexOf('/');
-                                        RemoteServer.m3u8Content = removeMinorityUrl(finalforwardurl.substring(0, ilast + 1), content);
+                                        RemoteServer.m3u8Content = M3u8.purify(finalforwardurl.substring(0, ilast + 1), content);
 
                                         if (RemoteServer.m3u8Content == null)
                                             startPlayUrl(finalforwardurl, headers);
@@ -1774,6 +1820,7 @@ public class PlayFragment extends BaseLazyFragment {
         public void onPageFinished(WebView view, String url) {
             super.onPageFinished(view, url);
             String click = sourceBean.getClickSelector();
+            if (click.isEmpty()) click = VideoParseRuler.getHostScript(url);
             LOG.i("onPageFinished url:" + url);
 
             if (!click.isEmpty()) {

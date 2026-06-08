@@ -42,26 +42,26 @@ public class CastListDialog extends CenterPopupView {
     @Override
     protected void onCreate() {
         super.onCreate();
-        DLNACastManager.getInstance().bindCastService(App.getInstance());
+        DLNACastManager.INSTANCE.bindCastService(App.getInstance());
         findViewById(R.id.btn_cancel).setOnClickListener(view -> {
             dismiss();
         });
         findViewById(R.id.btn_confirm).setOnClickListener(view ->{
             adapter.setNewData(new ArrayList<>());
-            DLNACastManager.getInstance().search(null, 1);
+            DLNACastManager.INSTANCE.search(null);
         });
         RecyclerView rv = findViewById(R.id.rv);
         rv.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new CastDevicesAdapter();
         rv.setAdapter(adapter);
-        DLNACastManager.getInstance().registerDeviceListener(adapter);
+        DLNACastManager.INSTANCE.registerDeviceListener(adapter);
 
         adapter.setOnItemClickListener(new BaseQuickAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(BaseQuickAdapter adapter, View view, int position) {
                 Device item = (Device)adapter.getItem(position);
                 if (item!=null){
-                    DLNACastManager.getInstance().cast(item,castVideo);
+                    DLNACastManager.INSTANCE.connectDevice(item, null).setAVTransportURI(castVideo.getUri(), castVideo.getName(), null);
                 }
             }
         });
@@ -70,7 +70,7 @@ public class CastListDialog extends CenterPopupView {
     @Override
     protected void onDismiss() {
         super.onDismiss();
-        DLNACastManager.getInstance().unregisterListener(adapter);
-        DLNACastManager.getInstance().unbindCastService(App.getInstance());
+        DLNACastManager.INSTANCE.unregisterListener(adapter);
+        DLNACastManager.INSTANCE.unbindCastService(App.getInstance());
     }
 }

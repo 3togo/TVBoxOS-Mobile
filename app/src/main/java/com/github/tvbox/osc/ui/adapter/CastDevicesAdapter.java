@@ -34,10 +34,6 @@ public class CastDevicesAdapter extends BaseQuickAdapter<Device, BaseViewHolder>
         addData(device);
     }
 
-    @Override
-    public void onDeviceUpdated(Device<?, ?, ?> device) {
-
-    }
 
     @Override
     public void onDeviceRemoved(Device<?, ?, ?> device) {
