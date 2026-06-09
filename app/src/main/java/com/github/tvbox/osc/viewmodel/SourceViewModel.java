@@ -649,9 +649,29 @@ public class SourceViewModel extends ViewModel {
                 @Override
                 public void run() {
                     Spider sp = ApiConfig.get().getCSP(sourceBean);
+                    final String[] jsonResult = {null};
+                    Thread spiderThread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                jsonResult[0] = sp.playerContent(playFlag, url, ApiConfig.get().getVipParseFlags());
+                            } catch (Throwable th) {
+                                th.printStackTrace();
+                            }
+                        }
+                    });
+                    spiderThread.start();
                     try {
-                        String json = sp.playerContent(playFlag, url, ApiConfig.get().getVipParseFlags());
-                        JSONObject result = new JSONObject(json);
+                        spiderThread.join(10 * 1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    if (jsonResult[0] == null) {
+                        playResult.postValue(null);
+                        return;
+                    }
+                    try {
+                        JSONObject result = new JSONObject(jsonResult[0]);
                         result.put("key", url);
                         result.put("proKey", progressKey);
                         result.put("subtKey", subtitleKey);

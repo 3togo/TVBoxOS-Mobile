@@ -20,6 +20,7 @@ import org.greenrobot.eventbus.EventBus;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -29,6 +30,8 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -112,6 +115,37 @@ public class RemoteServer extends NanoHTTPD {
                     Map < String, String > params = session.getParms();
                     params.putAll(session.getHeaders());
                     params.put("request-headers", new Gson().toJson(session.getHeaders()));
+                    if (params.containsKey("go") && params.get("go").equals("bom")) {
+                        try {
+                            String bomUrl = params.get("url");
+                            if (bomUrl != null && !bomUrl.isEmpty()) {
+                                HttpURLConnection conn = (HttpURLConnection) new URL(bomUrl).openConnection();
+                                conn.setConnectTimeout(10000);
+                                conn.setReadTimeout(10000);
+                                conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+                                InputStream is = conn.getInputStream();
+                                byte[] data = new byte[4096];
+                                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                int len;
+                                while ((len = is.read(data)) != -1) {
+                                    baos.write(data, 0, len);
+                                }
+                                is.close();
+                                conn.disconnect();
+                                byte[] result = baos.toByteArray();
+                                // Strip UTF-8 BOM (EF BB BF)
+                                if (result.length >= 3 && (result[0] & 0xFF) == 0xEF && (result[1] & 0xFF) == 0xBB && (result[2] & 0xFF) == 0xBF) {
+                                    byte[] stripped = new byte[result.length - 3];
+                                    System.arraycopy(result, 3, stripped, 0, stripped.length);
+                                    result = stripped;
+                                }
+                                return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.OK, "application/vnd.apple.mpegurl", new ByteArrayInputStream(result), result.length);
+                            }
+                        } catch (Throwable th) {
+                            th.printStackTrace();
+                        }
+                        return NanoHTTPD.newFixedLengthResponse(NanoHTTPD.Response.Status.INTERNAL_ERROR, NanoHTTPD.MIME_PLAINTEXT, "BOM proxy error");
+                    }
                     if (params.containsKey("do")) {
                         Object[] rs = ApiConfig.get().proxyLocal(params);
                         //if (rs[0] instanceof Response) {
