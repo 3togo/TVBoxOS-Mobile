@@ -155,10 +155,6 @@ class HomeFragment : BaseVbFragment<FragmentHomeBinding>() {
     private fun loadConfig(){
         ApiConfig.get().loadConfig(onlyConfigChanged, object : LoadConfigCallback {
 
-            override fun retry() {
-                mHandler.post { initData() }
-            }
-
             override fun success() {
                 dataInitOk = true
                 if (ApiConfig.get().spider.isEmpty()) {
@@ -177,6 +173,10 @@ class HomeFragment : BaseVbFragment<FragmentHomeBinding>() {
                 } else {
                     showTipDialog(msg)
                 }
+            }
+
+            override fun notice(msg: String) {
+                // Non-fatal notification, ignore or log
             }
         }, activity)
     }
@@ -197,7 +197,6 @@ class HomeFragment : BaseVbFragment<FragmentHomeBinding>() {
                         }, 50)
                     }
 
-                    override fun retry() {}
                     override fun error(msg: String) {
                         jarInitOk = true
                         mHandler.post {
@@ -205,6 +204,8 @@ class HomeFragment : BaseVbFragment<FragmentHomeBinding>() {
                             initData()
                         }
                     }
+
+                    override fun notice(msg: String) {}
                 })
         }
     }

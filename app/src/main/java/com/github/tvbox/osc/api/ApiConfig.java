@@ -39,6 +39,8 @@ import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.MD5;
 import com.github.tvbox.osc.util.M3u8;
+import com.github.tvbox.osc.util.OkGoHelper;
+import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.VideoParseRuler;
 import com.github.tvbox.osc.util.M3u8;
 import com.google.gson.Gson;
@@ -112,6 +114,7 @@ public class ApiConfig {
     private JsLoader jsLoader = new JsLoader();
 
     private String userAgent = "okhttp/3.15";
+    private static String jarCache = "true";
 
     private String requestAccept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9";
 
@@ -205,6 +208,9 @@ public class ApiConfig {
             configUrl = apiUrl;
         }
         String configKey = TempKey;
+        // Save config URL for debugging/recovery
+        File configUrlFile = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/config_url");
+        FileUtils.saveCache(configUrlFile, configUrl);
         OkGo.<String>get(configUrl)
                 .headers("User-Agent", userAgent)
                 .headers("Accept", requestAccept)
@@ -214,19 +220,7 @@ public class ApiConfig {
                         try {
                             String json = response.body();
                             parseJson(apiUrl, json);
-                            try {
-                                File cacheDir = cache.getParentFile();
-                                if (!cacheDir.exists())
-                                    cacheDir.mkdirs();
-                                if (cache.exists())
-                                    cache.delete();
-                                FileOutputStream fos = new FileOutputStream(cache);
-                                fos.write(json.getBytes("UTF-8"));
-                                fos.flush();
-                                fos.close();
-                            } catch (Throwable th) {
-                                th.printStackTrace();
-                            }
+                            FileUtils.saveCache(cache, json);
                             callback.success();
                         } catch (Throwable th) {
                             th.printStackTrace();
@@ -272,7 +266,7 @@ public class ApiConfig {
         String[] urls = spider.split(";md5;");
         String jarUrl = urls[0];
         String md5 = urls.length > 1 ? urls[1].trim() : "";
-        File cache = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/csp.jar");
+        File cache = new File(App.getInstance().getFilesDir().getAbsolutePath() + "/csp/" + MD5.string2MD5(jarUrl) + ".jar");
 
         if (!md5.isEmpty() || useCache) {
             if (cache.exists() && (useCache || MD5.getFileMd5(cache).equalsIgnoreCase(md5))) {
@@ -305,7 +299,12 @@ public class ApiConfig {
                     byte[] imgJar = getImgJar(respData);
                     fos.write(imgJar);
                 } else {
-                    fos.write(response.body().bytes());
+                    InputStream inputStream = response.body().byteStream();
+                    byte[] buffer = new byte[4096];
+                    int bytesRead;
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        fos.write(buffer, 0, bytesRead);
+                    }
                 }
                 fos.flush();
                 fos.close();
@@ -349,6 +348,7 @@ public class ApiConfig {
         JsonObject infoJson = new Gson().fromJson(jsonStr, JsonObject.class);
         // spider
         spider = DefaultConfig.safeJsonString(infoJson, "spider", "");
+        jarCache = DefaultConfig.safeJsonString(infoJson, "jarCache", "true");
         // wallpaper
         wallpaper = DefaultConfig.safeJsonString(infoJson, "wallpaper", "");
         // 远端站点源
@@ -376,6 +376,7 @@ public class ApiConfig {
             sb.setPlayerType(DefaultConfig.safeJsonInt(obj, "playerType", -1));
             sb.setCategories(DefaultConfig.safeJsonStringList(obj, "categories"));
             sb.setClickSelector(DefaultConfig.safeJsonString(obj, "click", ""));
+            sb.setStyle(DefaultConfig.safeJsonString(obj, "style", ""));
             if (firstSite == null)
                 firstSite = sb;
             sourceBeanList.put(siteKey, sb);
@@ -404,6 +405,7 @@ public class ApiConfig {
                 pb.setType(DefaultConfig.safeJsonInt(obj, "type", 0));
                 parseBeanList.add(pb);
             }
+            if(!parseBeanList.isEmpty())addSuperParse();
         }
         // 获取默认解析
         if (parseBeanList != null && parseBeanList.size() > 0) {
@@ -582,10 +584,47 @@ public class ApiConfig {
                     for (JsonElement one : array) {
                         String host = one.getAsString();
                         VideoParseRuler.addHostRule(host, rule);
+                        VideoParseRuler.addHostRegex(host, ads);
+                    }
+                }
+                if (obj.has("hosts") && obj.has("script")) {
+                    ArrayList<String> scripts = new ArrayList<>();
+                    JsonArray scriptArray = obj.getAsJsonArray("script");
+                    for (JsonElement one : scriptArray) {
+                        String script = one.getAsString();
+                        scripts.add(script);
+                    }
+                    JsonArray sArray = obj.getAsJsonArray("hosts");
+                    for (JsonElement one : sArray) {
+                        String host = one.getAsString();
+                        VideoParseRuler.addHostScript(host, scripts);
                     }
                 }
             }
         }
+
+        myHosts = new HashMap<>();
+        if (infoJson.has("hosts")) {
+            JsonArray hostsArray = infoJson.getAsJsonArray("hosts");
+            for (int i = 0; i < hostsArray.size(); i++) {
+                String entry = hostsArray.get(i).getAsString();
+                String[] parts = entry.split("=", 2);
+                if (parts.length == 2) {
+                    myHosts.put(parts[0], parts[1]);
+                }
+            }
+        }
+
+        if (infoJson.has("doh")) {
+            String doh_json = infoJson.getAsJsonArray("doh").toString();
+            if (!Hawk.get(HawkConfig.DOH_JSON, "").equals(doh_json)) {
+                Hawk.put(HawkConfig.DOH_URL, 0);
+                Hawk.put(HawkConfig.DOH_JSON, doh_json);
+            }
+        } else {
+            Hawk.put(HawkConfig.DOH_JSON, "");
+        }
+        OkGoHelper.setDnsList();
 
         String defaultIJKADS="{\"ijk\":[{\"options\":[{\"name\":\"opensles\",\"category\":4,\"value\":\"0\"},{\"name\":\"framedrop\",\"category\":4,\"value\":\"1\"},{\"name\":\"soundtouch\",\"category\":4,\"value\":\"1\"},{\"name\":\"start-on-prepared\",\"category\":4,\"value\":\"1\"},{\"name\":\"http-detect-rangeupport\",\"category\":1,\"value\":\"0\"},{\"name\":\"fflags\",\"category\":1,\"value\":\"fastseek\"},{\"name\":\"skip_loop_filter\",\"category\":2,\"value\":\"48\"},{\"name\":\"reconnect\",\"category\":4,\"value\":\"1\"},{\"name\":\"enable-accurate-seek\",\"category\":4,\"value\":\"0\"},{\"name\":\"mediacodec\",\"category\":4,\"value\":\"0\"},{\"name\":\"mediacodec-all-videos\",\"category\":4,\"value\":\"0\"},{\"name\":\"mediacodec-auto-rotate\",\"category\":4,\"value\":\"0\"},{\"name\":\"mediacodec-handle-resolution-change\",\"category\":4,\"value\":\"0\"},{\"name\":\"mediacodec-hevc\",\"category\":4,\"value\":\"0\"},{\"name\":\"max-buffer-size\",\"category\":4,\"value\":\"15728640\"}],\"group\":\"软解码\"},{\"options\":[{\"name\":\"opensles\",\"category\":4,\"value\":\"0\"},{\"name\":\"framedrop\",\"category\":4,\"value\":\"1\"},{\"name\":\"soundtouch\",\"category\":4,\"value\":\"1\"},{\"name\":\"start-on-prepared\",\"category\":4,\"value\":\"1\"},{\"name\":\"http-detect-rangeupport\",\"category\":1,\"value\":\"0\"},{\"name\":\"fflags\",\"category\":1,\"value\":\"fastseek\"},{\"name\":\"skip_loop_filter\",\"category\":2,\"value\":\"48\"},{\"name\":\"reconnect\",\"category\":4,\"value\":\"1\"},{\"name\":\"enable-accurate-seek\",\"category\":4,\"value\":\"0\"},{\"name\":\"mediacodec\",\"category\":4,\"value\":\"1\"},{\"name\":\"mediacodec-all-videos\",\"category\":4,\"value\":\"1\"},{\"name\":\"mediacodec-auto-rotate\",\"category\":4,\"value\":\"1\"},{\"name\":\"mediacodec-handle-resolution-change\",\"category\":4,\"value\":\"1\"},{\"name\":\"mediacodec-hevc\",\"category\":4,\"value\":\"1\"},{\"name\":\"max-buffer-size\",\"category\":4,\"value\":\"15728640\"}],\"group\":\"硬解码\"}],\"ads\":[\"mimg.0c1q0l.cn\",\"www.googletagmanager.com\",\"www.google-analytics.com\",\"mc.usihnbcq.cn\",\"mg.g1mm3d.cn\",\"mscs.svaeuzh.cn\",\"cnzz.hhttm.top\",\"tp.vinuxhome.com\",\"cnzz.mmstat.com\",\"www.baihuillq.com\",\"s23.cnzz.com\",\"z3.cnzz.com\",\"c.cnzz.com\",\"stj.v1vo.top\",\"z12.cnzz.com\",\"img.mosflower.cn\",\"tips.gamevvip.com\",\"ehwe.yhdtns.com\",\"xdn.cqqc3.com\",\"www.jixunkyy.cn\",\"sp.chemacid.cn\",\"hm.baidu.com\",\"s9.cnzz.com\",\"z6.cnzz.com\",\"um.cavuc.com\",\"mav.mavuz.com\",\"wofwk.aoidf3.com\",\"z5.cnzz.com\",\"xc.hubeijieshikj.cn\",\"tj.tianwenhu.com\",\"xg.gars57.cn\",\"k.jinxiuzhilv.com\",\"cdn.bootcss.com\",\"ppl.xunzhuo123.com\",\"xomk.jiangjunmh.top\",\"img.xunzhuo123.com\",\"z1.cnzz.com\",\"s13.cnzz.com\",\"xg.huataisangao.cn\",\"z7.cnzz.com\",\"xg.huataisangao.cn\",\"z2.cnzz.com\",\"s96.cnzz.com\",\"q11.cnzz.com\",\"thy.dacedsfa.cn\",\"xg.whsbpw.cn\",\"s19.cnzz.com\",\"z8.cnzz.com\",\"s4.cnzz.com\",\"f5w.as12df.top\",\"ae01.alicdn.com\",\"www.92424.cn\",\"k.wudejia.com\",\"vivovip.mmszxc.top\",\"qiu.xixiqiu.com\",\"cdnjs.hnfenxun.com\",\"cms.qdwght.com\"]}";
         JsonObject defaultJson=new Gson().fromJson(defaultIJKADS, JsonObject.class);
@@ -721,6 +760,8 @@ public class ApiConfig {
         void retry();
 
         void error(String msg);
+
+        void notice(String msg);
     }
 
     public interface FastParseCallback {
@@ -846,11 +887,12 @@ public class ApiConfig {
 
     String clanContentFix(String lanLink, String content) {
         String fix = lanLink.substring(0, lanLink.indexOf("/file/") + 6);
-        return content.replace("clan://", fix);
+        return content.replace("clan://localhost/", fix).replace("file://", fix);
     }
 
     String fixContentPath(String url, String content) {
         if (content.contains("\"./")) {
+            url = url.replace("file://", "clan://localhost/");
             if(!url.startsWith("http") && !url.startsWith("clan://")){
                 url = "http://" + url;
             }
@@ -858,5 +900,50 @@ public class ApiConfig {
             content = content.replace("./", url.substring(0,url.lastIndexOf("/") + 1));
         }
         return content;
+    }
+
+    public Map<String, String> getMyHost() {
+        return myHosts;
+    }
+
+    public void clearJarLoader() {
+        jarLoader.clear();
+    }
+
+    private void addSuperParse() {
+        ParseBean superPb = new ParseBean();
+        superPb.setName("超级解析");
+        superPb.setUrl("SuperParse");
+        superPb.setExt("");
+        superPb.setType(4);
+        parseBeanList.add(0, superPb);
+    }
+
+    public void clearLoader() {
+        jarLoader.clear();
+        jsLoader.clear();
+    }
+
+    private List<SourceBean> searchSourceBeanList = new ArrayList<>();
+    public List<SourceBean> getSearchSourceBeanList() {
+        if (searchSourceBeanList.isEmpty()) {
+            searchSourceBeanList = new ArrayList<>();
+            for (SourceBean bean : sourceBeanList.values()) {
+                if (bean.isSearchable()) {
+                    searchSourceBeanList.add(bean);
+                }
+            }
+        }
+        return searchSourceBeanList;
+    }
+
+    public List<SourceBean> getSwitchSourceBeanList() {
+        List<SourceBean> filteredList = new ArrayList<>();
+        for (SourceBean bean : sourceBeanList.values()) {
+            if (bean.getFilterable() == 1) {
+                filteredList.add(bean);
+            }
+        }
+        return filteredList;
     }
 }

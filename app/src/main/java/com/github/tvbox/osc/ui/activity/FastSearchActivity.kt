@@ -577,7 +577,7 @@ class FastSearchActivity : BaseVbActivity<ActivityFastSearchBinding>(), TextWatc
             if (searchExecutorService != null) {
                 searchExecutorService!!.shutdownNow()
                 searchExecutorService = null
-                JsLoader.load()
+                JsLoader.destroy()
             }
         } catch (th: Throwable) {
             th.printStackTrace()
