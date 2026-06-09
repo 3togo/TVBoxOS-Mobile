@@ -195,6 +195,8 @@ import org.jetbrains.annotations.NotNull;
 import com.github.tvbox.osc.util.M3u8;
 import org.json.JSONException;
 import com.github.tvbox.osc.util.M3u8;
+import org.json.JSONArray;
+import com.github.tvbox.osc.util.M3u8;
 import org.json.JSONObject;
 import com.github.tvbox.osc.util.M3u8;
 
@@ -803,6 +805,10 @@ public class PlayFragment extends BaseLazyFragment {
             startPlayUrl(url, headers);
             return;
         }
+        if (url.contains(".mpd") || url.startsWith("data:application/dash+xml")) {
+            startPlayUrl(url, headers);
+            return;
+        }
         if(DefaultConfig.noAd(mVodInfo.playFlag)){
             startPlayUrl(url, headers);
             return;
@@ -914,10 +920,25 @@ public class PlayFragment extends BaseLazyFragment {
                 });
     }
 
+    String firstUrlByArray(String url) {
+        try {
+            JSONArray arr = new JSONArray(url);
+            for (int i = 0; i < arr.length(); i++) {
+                String item = arr.optString(i, "");
+                if (item.contains("http")) {
+                    return item;
+                }
+            }
+        } catch (Throwable th) {
+        }
+        return url;
+    }
+
     void startPlayUrl(String url, HashMap<String, String> headers) {
+        url = firstUrlByArray(url);
         LOG.i("playUrl:" + url);
         if (autoRetryCount > 0 && url.contains(".m3u8")) {
-            url = "http://home.jundie.top:666/unBom.php?m3u8=" + url;//尝试去bom头再次播放
+            url = "http://127.0.0.1:" + RemoteServer.serverPort + "/proxy?go=bom&url=" + url;//尝试去bom头再次播放
         }
         String finalUrl = url;
         if (mActivity == null || !isAdded()) return;

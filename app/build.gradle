@@ -283,4 +283,10 @@ dependencies {
     implementation 'com.github.cyf783.DLNA-Cast:dmc:v2.0.3'
     // Lifecycles only (without ViewModel or LiveData)
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0"
+
+    // Test dependencies
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.mockito:mockito-core:4.8.0'
+    testImplementation 'org.robolectric:robolectric:4.9'
+    testImplementation 'org.json:json:20220320'
 }
