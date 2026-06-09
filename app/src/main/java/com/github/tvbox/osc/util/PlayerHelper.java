@@ -294,4 +294,15 @@ public class PlayerHelper {
         else
             return speed > 0?speed + "B/s":"";
     }
+
+    public static String getDisplaySpeedBps(long speed) {
+        if (speed > 1073741824)
+            return new DecimalFormat("#.00").format(speed / 1073741824d) + "Gbps";
+        else if (speed > 1048576)
+            return new DecimalFormat("#.00").format(speed / 1048576d) + "Mbps";
+        else if (speed > 1024)
+            return (speed / 1024) + "Kbps";
+        else
+            return speed > 0 ? speed + "bps" : "";
+    }
 }

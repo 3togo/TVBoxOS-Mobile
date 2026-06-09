@@ -202,6 +202,7 @@ class HomeFragment : BaseVbFragment<FragmentHomeBinding>() {
                     }
 
                     override fun retry() {}
+                    override fun notice(msg: String) {}
                     override fun error(msg: String) {
                         jarInitOk = true
                         mHandler.post {

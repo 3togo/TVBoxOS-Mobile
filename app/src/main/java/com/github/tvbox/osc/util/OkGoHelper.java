@@ -58,6 +58,8 @@ public class OkGoHelper {
             + "{\"name\": \"360\", \"url\": \"https://doh.360.cn/dns-query\"}"
             + "]";
 
+    static OkHttpClient ItvClient = null;
+
     static void initExoOkHttpClient() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor("OkExoPlayer");
@@ -83,7 +85,8 @@ public class OkGoHelper {
         }
 
         builder.dns(new CustomDns(dnsOverHttps));
-        ExoMediaSourceHelper.getInstance(App.getInstance()).setOkClient(builder.build());
+        ItvClient = builder.build();
+        ExoMediaSourceHelper.getInstance(App.getInstance()).setOkClient(ItvClient);
     }
 
     public static DnsOverHttps dnsOverHttps = null;
