@@ -1,94 +1,54 @@
 package com.github.tvbox.osc.api;
 
 import android.app.Activity;
-import com.github.tvbox.osc.util.M3u8;
 import android.net.Uri;
-import com.github.tvbox.osc.util.M3u8;
 import android.text.TextUtils;
-import com.github.tvbox.osc.util.M3u8;
 import android.util.Base64;
-import com.github.tvbox.osc.util.M3u8;
 
 import com.github.catvod.crawler.JarLoader;
-import com.github.tvbox.osc.util.M3u8;
 import com.github.catvod.crawler.JsLoader;
-import com.github.tvbox.osc.util.M3u8;
 import com.github.catvod.crawler.Spider;
-import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.base.App;
-import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.bean.LiveChannelGroup;
-import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.bean.IJKCode;
-import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.bean.LiveChannelItem;
-import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.bean.ParseBean;
-import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.bean.SourceBean;
-import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.server.ControlManager;
-import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.AES;
-import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.AdBlocker;
-import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.DefaultConfig;
-import com.github.tvbox.osc.util.M3u8;
+import com.github.tvbox.osc.util.FileUtils;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.MD5;
-import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.OkGoHelper;
-import com.github.tvbox.osc.util.M3u8;
 import com.github.tvbox.osc.util.VideoParseRuler;
-import com.github.tvbox.osc.util.M3u8;
 import com.google.gson.Gson;
-import com.github.tvbox.osc.util.M3u8;
 import com.google.gson.JsonArray;
-import com.github.tvbox.osc.util.M3u8;
 import com.google.gson.JsonElement;
-import com.github.tvbox.osc.util.M3u8;
 import com.google.gson.JsonObject;
-import com.github.tvbox.osc.util.M3u8;
 import com.lzy.okgo.OkGo;
-import com.github.tvbox.osc.util.M3u8;
 import com.lzy.okgo.callback.AbsCallback;
-import com.github.tvbox.osc.util.M3u8;
 import com.lzy.okgo.model.Response;
-import com.github.tvbox.osc.util.M3u8;
 import com.orhanobut.hawk.Hawk;
-import com.github.tvbox.osc.util.M3u8;
 
 import org.apache.commons.lang3.StringUtils;
-import com.github.tvbox.osc.util.M3u8;
 import org.json.JSONObject;
-import com.github.tvbox.osc.util.M3u8;
 
 import java.io.BufferedReader;
-import com.github.tvbox.osc.util.M3u8;
 import java.io.File;
-import com.github.tvbox.osc.util.M3u8;
 import java.io.FileInputStream;
-import com.github.tvbox.osc.util.M3u8;
 import java.io.FileOutputStream;
-import com.github.tvbox.osc.util.M3u8;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import com.github.tvbox.osc.util.M3u8;
 import java.util.ArrayList;
-import com.github.tvbox.osc.util.M3u8;
 import java.util.HashMap;
-import com.github.tvbox.osc.util.M3u8;
 import java.util.LinkedHashMap;
-import com.github.tvbox.osc.util.M3u8;
 import java.util.List;
-import com.github.tvbox.osc.util.M3u8;
 import java.util.Map;
-import com.github.tvbox.osc.util.M3u8;
 import java.util.regex.Matcher;
-import com.github.tvbox.osc.util.M3u8;
 import java.util.regex.Pattern;
-import com.github.tvbox.osc.util.M3u8;
 
 /**
  * @author pj567
@@ -757,11 +717,11 @@ public class ApiConfig {
     public interface LoadConfigCallback {
         void success();
 
-        void retry();
+        default void retry() {}
 
         void error(String msg);
 
-        void notice(String msg);
+        default void notice(String msg) {}
     }
 
     public interface FastParseCallback {
