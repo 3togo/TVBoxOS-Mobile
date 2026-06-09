@@ -513,4 +513,24 @@ public class FileUtils {
         }
         return;
     }
+
+    public static void saveCache(File file, String data) {
+        try {
+            File parent = file.getParentFile();
+            if (parent != null && !parent.exists()) parent.mkdirs();
+            if (file.exists()) file.delete();
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(data.getBytes("UTF-8"));
+            fos.flush();
+            fos.close();
+        } catch (Throwable th) {
+            th.printStackTrace();
+        }
+    }
+
+    public static boolean isWeekAgo(File file) {
+        if (!file.exists()) return true;
+        long diff = System.currentTimeMillis() - file.lastModified();
+        return diff > 7 * 24 * 60 * 60 * 1000L;
+    }
 }

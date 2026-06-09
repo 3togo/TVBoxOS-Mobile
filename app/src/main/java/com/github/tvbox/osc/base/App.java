@@ -113,7 +113,7 @@ public class App extends MultiDexApplication {
     @Override
     public void onTerminate() {
         super.onTerminate();
-        JsLoader.load();
+        JsLoader.destroy();
     }
 
     private void putDefault(String key, Object value) {
@@ -155,6 +155,16 @@ public class App extends MultiDexApplication {
                 .errorDrawable(R.drawable.app_icon) //错误图标
                 .restartActivity(MainActivity.class) //重新启动后的activity
                 .apply();
+    }
+
+    private static String dashData;
+
+    public void setDashData(String data) {
+        dashData = data;
+    }
+
+    public String getDashData() {
+        return dashData;
     }
 
 }

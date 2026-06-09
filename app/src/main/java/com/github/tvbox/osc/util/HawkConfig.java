@@ -64,4 +64,11 @@ public class HawkConfig {
      * 搜索记录
      */
     public static final String HISTORY_SEARCH = "history_search";
+    public static final String DOH_JSON = "doh_json";
+    public static final String LIVE_API_URL = "live_api_url";
+    public static final String LIVE_GROUP_LIST = "live_group_list";
+    public static final String LIVE_GROUP_INDEX = "live_group_index";
+    public static final String LIVE_PLAY_TYPE = "live_play_type";
+    public static final String LIVE_WEB_HEADER = "live_web_header";
+    public static final String PLAYER_IS_LIVE = "player_is_live";
 }
